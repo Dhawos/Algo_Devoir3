@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "Utility.h"
 using std::ifstream;
 using std::stringstream;
 using std::string;
@@ -12,17 +13,6 @@ using std::getline;
 using std::find;
 using std::stoi;
 
-std::vector<std::string> split(const std::string &s, char delim) {
-	std::stringstream ss(s);
-	std::string item;
-	std::vector<std::string> elems;
-	while (std::getline(ss, item, delim)) {
-		elems.push_back(item);
-		// elems.push_back(std::move(item)); // if C++11 (based on comment from @mchiasson)
-	}
-	return elems;
-
-}
 GraphParser::GraphParser(string filename)
 {
 	this->filename = filename;
@@ -47,7 +37,7 @@ std::shared_ptr<AFDGraph> GraphParser::parseFile()
 		int nbFinalStates = stoi(line);
 		//Fifth line is IDs of final states
 		getline(file, line);
-		vector<string> finalStatesID = split(line,' ');
+		vector<string> finalStatesID = Utility::split(line,' ');
 		vector<int> finalStatesIDint = vector<int>();
 		for (int i = 0; i < finalStatesID.size(); i++) {
 			finalStatesIDint.push_back(stoi(finalStatesID[i]));
@@ -78,12 +68,12 @@ std::shared_ptr<AFDGraph> GraphParser::parseFile()
 		int i = 1;
 		while (i <= nbEdges) {
 			getline(file, line);
-			vector<string> splittedLine = split(line, ' ');
+			vector<string> splittedLine = Utility::split(line, ' ');
 			string transition = splittedLine[0];
 			int firstNodeId = stoi(splittedLine[1]);
 			int outNodeId = stoi(splittedLine[2]);
 			int weight = stoi(splittedLine[3]);
-			newGraph->getState(firstNodeId).addEdge(&(newGraph->getState(outNodeId)), transition, weight);
+			newGraph->getState(firstNodeId).addEdge(&newGraph->getState(outNodeId), transition, weight);
 			i++;
 		}
 		return newGraph;

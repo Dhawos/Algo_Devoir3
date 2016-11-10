@@ -2,6 +2,10 @@
 #include "State.h"
 
 
+State::State()
+{
+}
+
 State::State(int id, vector<Edge> outEdges, bool final)
 {
 	this->id = id;
@@ -37,9 +41,20 @@ void State::addEdge(State* outState, string transition, int weight)
 	this->outEdges.push_back(newEdge);
 }
 
+void State::addEdge(const State* outState, string transition, int weight)
+{
+	Edge newEdge = Edge(outState, transition, weight);
+	this->outEdges.push_back(newEdge);
+}
+
 Edge State::getEdge(int i)
 {
 	return this->outEdges[i];
+}
+
+const vector<Edge>& State::getEdges()
+{
+	return this->outEdges;
 }
 
 bool State::isFinal()

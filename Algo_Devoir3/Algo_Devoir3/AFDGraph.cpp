@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "AFDGraph.h"
-
+#include "NotFoundException.h"
 
 AFDGraph::AFDGraph()
 {
@@ -13,13 +13,8 @@ void AFDGraph::createAndInsertState(int id, bool final, bool start)
 	State newState = State(id, final);
 	this->states.push_back(newState);
 	if (start) {
-		this->startStateId = this->states.size() - 1;
+		this->startStateId = id;
 	}
-}
-
-const State & AFDGraph::getState(int i) const
-{
-	return this->states[i];
 }
 
 State & AFDGraph::getState(int id)
@@ -33,15 +28,31 @@ State & AFDGraph::getState(int id)
 	return *it; 
 }
 
-const State & AFDGraph::getState(const State & state) const
+State & AFDGraph::getStartState()
 {
-	vector<State>::const_iterator it ;
-	for (it = this->states.cbegin(); it != this->states.cend(); ++it) {
+	vector<State>::iterator it;
+	for (it = this->states.begin(); it != this->states.end(); ++it) {
+		if (it->getId() == this->startStateId) {
+			return *it;
+		}
+	}
+	throw NotFoundException();
+}
+
+State & AFDGraph::getState(const State & state)
+{
+	vector<State>::iterator it;
+	for (it = this->states.begin(); it != this->states.end(); ++it) {
 		if (*it == state) {
 			break;
 		}
 	}
-	return *it;
+	throw NotFoundException();
+}
+
+const vector<State>& AFDGraph::getStates() const
+{
+	return this->states;
 }
 
 

@@ -9,14 +9,19 @@ Edge::Edge(State* outState, string transition, int weight) : outState(outState)
 	this->weight = weight;
 }
 
+Edge::Edge(const State* outState, string transition, int weight) : outState(outState)
+{
+	this->transition = transition;
+	this->weight = weight;
+}
+
 Edge::Edge(const Edge & edge) : outState(edge.outState)
 {
-	this->outState = edge.getOutState();
 	this->transition = edge.getTransition();
 	this->weight = edge.getWeight();
 }
 
-State* Edge::getOutState() const
+const State* Edge::getOutState()
 {
 	return this->outState;
 }

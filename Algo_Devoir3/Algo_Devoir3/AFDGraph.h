@@ -12,9 +12,10 @@ private:
 public:
 	AFDGraph();
 	void createAndInsertState(int id, bool final, bool start);
-	const State &getState(int index) const;
-	State &getState(int id);
-	const State &getState(const State &state) const;
+	State &getState(int index);
+	State &getStartState();
+	State &getState(const State &state);
+	const vector<State> &getStates() const;
 	virtual ~AFDGraph();
 };
 

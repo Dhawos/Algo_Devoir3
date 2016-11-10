@@ -13,6 +13,7 @@ private:
 	vector<Edge> outEdges;
 	bool final;
 public:
+	State();
 	State(int id,vector<Edge> outEdges, bool final);
 	State(int id, bool final);
 	virtual ~State();
@@ -20,7 +21,9 @@ public:
 	int getNbOutEdges();
 	void addEdge(Edge edge);
 	void addEdge(State* outState, string transition, int weight);
+	void addEdge(const State* outState, string transition, int weight);
 	Edge getEdge(int i);
+	const vector<Edge> & getEdges();
 	bool isFinal();
 };
 
