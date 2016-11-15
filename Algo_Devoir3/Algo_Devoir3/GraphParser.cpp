@@ -78,6 +78,7 @@ std::shared_ptr<AFDGraph> GraphParser::parseFile()
 		}
 		return newGraph;
 	}
+	return shared_ptr<AFDGraph>(NULL);
 }
 
 
