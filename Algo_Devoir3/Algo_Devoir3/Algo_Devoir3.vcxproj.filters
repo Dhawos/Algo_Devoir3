@@ -48,6 +48,18 @@
     <ClInclude Include="NotFoundException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Path.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InvalidEdgeException.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DijkstraNodeState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +90,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NotFoundException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Path.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InvalidEdgeException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DijkstraNodeState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

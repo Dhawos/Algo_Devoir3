@@ -5,6 +5,7 @@
 #include <iostream>
 #include "GraphParser.h"
 #include "LimitParser.h"
+#include "CommandProcessor.h"
 using std::getline;
 using std::cin;
 using std::string;
@@ -31,6 +32,14 @@ int main()
 		if (layerGraph == NULL) {
 			std::cout << "Fichier non existant" << std::endl;
 		}
+	}
+	bool shouldExit = false;
+	CommandProcessor cmdProcessor = CommandProcessor(layerGraph,shouldExit);
+	cmdProcessor.printHelp();
+	while (!shouldExit) {
+		std::cout << "Commande : ";
+		getline(std::cin, input);
+		cmdProcessor.processCommand(input);
 	}
     return 0;
 }

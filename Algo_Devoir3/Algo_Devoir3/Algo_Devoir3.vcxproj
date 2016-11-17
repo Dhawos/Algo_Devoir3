@@ -146,11 +146,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AFDGraph.h" />
+    <ClInclude Include="CommandProcessor.h" />
+    <ClInclude Include="DijkstraNodeState.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="GraphParser.h" />
+    <ClInclude Include="InvalidEdgeException.h" />
     <ClInclude Include="LayerGraph.h" />
     <ClInclude Include="LimitParser.h" />
     <ClInclude Include="NotFoundException.h" />
+    <ClInclude Include="Path.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -159,11 +163,15 @@
   <ItemGroup>
     <ClCompile Include="AFDGraph.cpp" />
     <ClCompile Include="Algo_Devoir3.cpp" />
+    <ClCompile Include="CommandProcessor.cpp" />
+    <ClCompile Include="DijkstraNodeState.cpp" />
     <ClCompile Include="Edge.cpp" />
     <ClCompile Include="GraphParser.cpp" />
+    <ClCompile Include="InvalidEdgeException.cpp" />
     <ClCompile Include="LayerGraph.cpp" />
     <ClCompile Include="LimitParser.cpp" />
     <ClCompile Include="NotFoundException.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

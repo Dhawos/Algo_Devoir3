@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include "Edge.h"
-
+#include "DijkstraNodeState.h"
 using std::shared_ptr;
 using std::vector;
 
@@ -10,6 +10,7 @@ class State
 {
 private:
 	int id;
+	DijkstraNodeState nodeState;
 	vector<Edge> outEdges;
 	bool final;
 public:
@@ -21,10 +22,14 @@ public:
 	int getNbOutEdges();
 	void addEdge(Edge edge);
 	void addEdge(State* outState, string transition, int weight);
-	void addEdge(const State* outState, string transition, int weight);
 	Edge getEdge(int i);
-	const vector<Edge> & getEdges();
-	bool isFinal();
+	DijkstraNodeState& getNodeState();
+	const vector<Edge> & getEdges() const;
+	bool isFinal() const;
+	bool compareIds(State const &s1) const;
+	bool const operator==(State &s1);
+	bool const operator>(State &s1);
+	bool const operator<(State &s1);
 };
 
-bool const operator==(State const &s1,State const &s2);
+

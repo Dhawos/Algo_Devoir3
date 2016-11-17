@@ -38,7 +38,7 @@ State & AFDGraph::getStartState()
 	}
 	throw NotFoundException();
 }
-
+/*
 State & AFDGraph::getState(const State & state)
 {
 	vector<State>::iterator it;
@@ -49,7 +49,7 @@ State & AFDGraph::getState(const State & state)
 	}
 	throw NotFoundException();
 }
-
+*/
 const vector<State>& AFDGraph::getStates() const
 {
 	return this->states;

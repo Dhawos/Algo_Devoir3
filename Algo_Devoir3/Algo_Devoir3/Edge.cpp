@@ -2,26 +2,27 @@
 #include "Edge.h"
 #include "State.h"
 
-Edge::Edge(State* outState, string transition, int weight) : outState(outState)
+Edge::Edge(State* outState, string transition, int weight)
 {
 	this->outState = outState;
 	this->transition = transition;
 	this->weight = weight;
 }
-
+/*
 Edge::Edge(const State* outState, string transition, int weight) : outState(outState)
 {
 	this->transition = transition;
 	this->weight = weight;
 }
-
-Edge::Edge(const Edge & edge) : outState(edge.outState)
+*/
+Edge::Edge(const Edge & edge)
 {
+	this->outState = edge.getOutState();
 	this->transition = edge.getTransition();
 	this->weight = edge.getWeight();
 }
 
-const State* Edge::getOutState()
+State* Edge::getOutState() const
 {
 	return this->outState;
 }

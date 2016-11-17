@@ -14,7 +14,7 @@ public:
 	void createAndInsertState(int id, bool final, bool start);
 	State &getState(int index);
 	State &getStartState();
-	State &getState(const State &state);
+	//State &getState(const State &state);
 	const vector<State> &getStates() const;
 	virtual ~AFDGraph();
 };

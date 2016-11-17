@@ -41,25 +41,29 @@ void State::addEdge(State* outState, string transition, int weight)
 	this->outEdges.push_back(newEdge);
 }
 
-void State::addEdge(const State* outState, string transition, int weight)
-{
-	Edge newEdge = Edge(outState, transition, weight);
-	this->outEdges.push_back(newEdge);
-}
-
 Edge State::getEdge(int i)
 {
 	return this->outEdges[i];
 }
 
-const vector<Edge>& State::getEdges()
+DijkstraNodeState & State::getNodeState()
+{
+	return this->nodeState;
+}
+
+const vector<Edge>& State::getEdges() const
 {
 	return this->outEdges;
 }
 
-bool State::isFinal()
+bool State::isFinal() const
 {
 	return this->final;
+}
+
+bool State::compareIds(State const & s1) const
+{
+	return this->getId() == s1.getId();
 }
 
 State::~State()
@@ -67,7 +71,17 @@ State::~State()
 	this->outEdges.clear();
 }
 
-bool const operator==(State const & s1, State const & s2)
+bool const State::operator==(State & s1)
 {
-	return s1.getId() == s2.getId();
+	return this->getNodeState().getCost() == s1.getNodeState().getCost();
+}
+
+bool const State::operator<(State & s1)
+{
+	return this->getNodeState().getCost() < s1.getNodeState().getCost();
+}
+
+bool const State::operator>(State & s1)
+{
+	return this->getNodeState().getCost() > s1.getNodeState().getCost();
 }

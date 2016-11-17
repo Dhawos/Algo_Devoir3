@@ -39,7 +39,7 @@ shared_ptr<LayerGraph> LimitParser::parseFile()
 			maxForEachLetter.push_back(stoi(maxForEachLetterString[i]));
 		}
 		//We now have all information needed so we build the layer Graph
-		return shared_ptr<LayerGraph>(new LayerGraph(this->graph,wordLength));
+		return shared_ptr<LayerGraph>(new LayerGraph(this->graph,wordLength,maxForEachLetter,minForEachLetter));
 	}
 	return shared_ptr<LayerGraph>(NULL);
 }
