@@ -9,6 +9,7 @@ using std::find;
 using std::push_heap;
 using std::pop_heap;
 using std::make_heap;
+using std::stoi;
 
 bool compare(State* a, State* b)
 {
@@ -122,8 +123,10 @@ bool LayerGraph::propagateStates(State& start, State& goal)
 			}
 			else {
 				outState->getNodeState().setNodeState(trialCost, false, currentState);
-				heap.push_back(outState);
-				push_heap(heap.begin(), heap.end(),compare);
+				if (checkConstraints(outState)) {
+					heap.push_back(outState);
+					push_heap(heap.begin(), heap.end(), compare);
+				}
 			}
 		}
 	}
@@ -142,33 +145,28 @@ Path LayerGraph::getOptimalPath()
 	return path;
 }
 
-/*
-Path LayerGraph::getMinimumPath()
+bool LayerGraph::checkConstraints(State * state)
 {
-	Path currentPath = Path();
-	Path bestPath = Path();
-	int bestWeight = -1;
-	for (Edge edge : this->sourceState.getEdges()) {
-		recursiveGetMinimumPath(edge.getOutState(),currentPath, bestPath);
+	vector<int> occurences = vector<int>(maximums.size(),0);
+	State* currentState = state;
+	while (!(*currentState == sourceState)) {
+		State* previousState = currentState->getNodeState().getPredecessor();
+		for (Edge edge : previousState->getEdges()) {
+			if (edge.getOutState() == currentState && edge.getTransition() != "") {
+				int index = stoi(edge.getTransition()) - 1;
+				occurences[index]++;
+			}
+		}
+		currentState = previousState;
 	}
-	return bestPath;
-}
-
-Path LayerGraph::recursiveGetMinimumPath(State* state, Path currentPath, Path& bestPath)
-{
-	if (isStateFinal(*state)) {
-		currentPath.pushState(state);
-		bestPath = currentPath;
-		return currentPath;
-	}
-	for (Edge edge : state->getEdges()) {
-		if (bestPath.getLength() == 0 || currentPath.getWeight() + edge.getWeight() < bestPath.getWeight()) {
-			recursiveGetMinimumPath(edge.getOutState(), currentPath, bestPath);
+	for (int i = 0; i < occurences.size(); i++) {
+		if (/*occurences[i] < minimums[i] || */occurences[i] > maximums[i]) {
+			return false;
 		}
 	}
-	return bestPath;
+	return true;
 }
-*/
+
 bool LayerGraph::isStateFinal(const State & state)
 {
 	for (Edge edge : state.getEdges()) {
