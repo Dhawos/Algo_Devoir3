@@ -4,10 +4,12 @@
 
 State::State()
 {
+	this->nodeState = DijkstraNodeState();
 }
 
 State::State(int id, vector<Edge> outEdges, bool final)
 {
+	this->nodeState = DijkstraNodeState();
 	this->id = id;
 	this->outEdges = outEdges;
 	this->final = final;
@@ -15,6 +17,7 @@ State::State(int id, vector<Edge> outEdges, bool final)
 
 State::State(int id, bool final)
 {
+	this->nodeState = DijkstraNodeState();
 	this->id = id;
 	this->outEdges = vector<Edge>();
 	this->final = final;
@@ -68,7 +71,6 @@ bool State::compareIds(State const & s1) const
 
 State::~State()
 {
-	this->outEdges.clear();
 }
 
 bool const State::operator==(State & s1)
@@ -84,4 +86,9 @@ bool const State::operator<(State & s1)
 bool const State::operator>(State & s1)
 {
 	return this->getNodeState().getCost() > s1.getNodeState().getCost();
+}
+
+bool const State::operator>=(State & s1)
+{
+	return this->getNodeState().getCost() >= s1.getNodeState().getCost();
 }

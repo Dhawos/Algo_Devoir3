@@ -3,9 +3,17 @@
 #include "Edge.h"
 #include <vector>
 #include <algorithm>
+#include <queue>
 using std::vector;
 using std::find;
+using std::push_heap;
+using std::pop_heap;
+using std::make_heap;
 
+bool compare(State* a, State* b)
+{
+	return (*a>*b);
+}
 
 LayerGraph::LayerGraph(AFDGraph graph, int wordLength, vector<int> maximums, vector<int> minimums)
 {
@@ -68,68 +76,73 @@ LayerGraph::~LayerGraph()
 
 Path LayerGraph::Dijkstra()
 {
-	bool goalReached = propagateStates(this->sourceState,this->finalState);
-	if (goalReached) {
+	if (this->finalState.getNodeState().isSet()) {
 		return getOptimalPath();
 	}
 	else {
-		//Handle error
+		bool goalReached = propagateStates(this->sourceState, this->finalState);
+		if (goalReached) {
+			return getOptimalPath();
+		}
+		else {
+			return Path();
+		}
 	}
 }
 
 bool LayerGraph::propagateStates(State& start, State& goal)
 {
-	vector<shared_ptr<State>> heap = vector<shared_ptr<State>>();
-	make_heap(heap.begin(), heap.end());
-	shared_ptr<State> currentState = shared_ptr<State>(&start);
+	vector<State *> heap = vector<State *>();
+	make_heap(heap.begin(), heap.end(),compare);
+	State* currentState = NULL;
+	heap.push_back(&start);
+	push_heap(heap.begin(), heap.end(),compare);
 	int trialCost = 0;
-	do {
+	while (!heap.empty() && (currentState == NULL || currentState->getId() != goal.getId())) {
+		pop_heap(heap.begin(), heap.end(),compare);
+		currentState = heap.back();
+		heap.pop_back();
 		currentState->getNodeState().setClosed(true);
 		for (Edge edge : currentState->getEdges()) {
 			trialCost = currentState->getNodeState().getCost() + edge.getWeight();
 			State* outState = edge.getOutState();
 			if (outState->getNodeState().isSet()) {
 				if (!edge.getOutState()->getNodeState().isClosed() && trialCost < edge.getOutState()->getNodeState().getCost()) {
-					vector<shared_ptr<State>>::iterator it;
+					vector<State *>::iterator it;
 					for (it = heap.begin(); it != heap.end(); ++it) {
-						if (it->get()->getId() == outState->getId()) {
+						if ((*it)->getId() == outState->getId()) {
 							break;
 						}
 					}
-					it->get()->getNodeState().setCost(trialCost);
+					(*it)->getNodeState().setCost(trialCost);
 					outState->getNodeState().setPredecessor(currentState);
 					outState->getNodeState().setCost(trialCost);
+					make_heap(heap.begin(), heap.end(), compare);
 				}
 			}
 			else {
 				outState->getNodeState().setNodeState(trialCost, false, currentState);
-				heap.push_back(shared_ptr<State>(outState));
-				push_heap(heap.begin(), heap.end());
-				sort_heap(heap.begin(), heap.end());
+				heap.push_back(outState);
+				push_heap(heap.begin(), heap.end(),compare);
 			}
-
 		}
-
-		pop_heap(heap.begin(), heap.end());
-		currentState = heap.back();
-		heap.pop_back();
-		sort_heap(heap.begin(), heap.end());
-	} while (!heap.empty() && currentState->getId() != goal.getId());
-	return *currentState == goal;
+	}
+	return currentState->getId() == goal.getId();
 }
 
 Path LayerGraph::getOptimalPath()
 {
-	shared_ptr<State> currentState = shared_ptr<State>(&this->finalState);
+	State* currentState = &this->finalState;
 	Path path = Path();
 	while (currentState->getId() != sourceState.getId()) {
 		path.pushState(currentState);
+		currentState = currentState->getNodeState().getPredecessor();
 	}
-	path.pushState(shared_ptr<State>(&sourceState));
+	path.pushState(&sourceState);
 	return path;
 }
 
-
+/*
 Path LayerGraph::getMinimumPath()
 {
 	Path currentPath = Path();
@@ -141,7 +154,7 @@ Path LayerGraph::getMinimumPath()
 	return bestPath;
 }
 
-Path LayerGraph::recursiveGetMinimumPath(const State* state, Path currentPath, Path& bestPath)
+Path LayerGraph::recursiveGetMinimumPath(State* state, Path currentPath, Path& bestPath)
 {
 	if (isStateFinal(*state)) {
 		currentPath.pushState(state);
@@ -155,7 +168,7 @@ Path LayerGraph::recursiveGetMinimumPath(const State* state, Path currentPath, P
 	}
 	return bestPath;
 }
-
+*/
 bool LayerGraph::isStateFinal(const State & state)
 {
 	for (Edge edge : state.getEdges()) {

@@ -5,17 +5,16 @@
 DijkstraNodeState::DijkstraNodeState()
 {
 	this->set = false;
+	this->cost = -1;
+	this->closed = false;
+	this->pred = NULL;
 }
 
-DijkstraNodeState::DijkstraNodeState(int cost, bool closed, shared_ptr<State> pred)
+DijkstraNodeState::DijkstraNodeState(int cost, bool closed, State* pred)
 {
 	this->cost = cost;
 	this->closed = closed;
 	this->pred = pred;
-}
-
-DijkstraNodeState::~DijkstraNodeState()
-{
 }
 
 int DijkstraNodeState::getCost() const
@@ -26,7 +25,6 @@ int DijkstraNodeState::getCost() const
 	else {
 		throw std::exception();
 	}
-	
 }
 
 bool DijkstraNodeState::isClosed() const
@@ -39,7 +37,7 @@ bool DijkstraNodeState::isClosed() const
 	}
 }
 
-shared_ptr<State> DijkstraNodeState::getPredecessor() const
+State* DijkstraNodeState::getPredecessor() const
 {
 	if (set) {
 		return pred;
@@ -48,7 +46,7 @@ shared_ptr<State> DijkstraNodeState::getPredecessor() const
 		throw std::exception();
 	}
 }
-void DijkstraNodeState::setNodeState(int cost, bool closed, shared_ptr<State> pred)
+void DijkstraNodeState::setNodeState(int cost, bool closed, State* pred)
 {
 	set = true;
 	this->cost = cost;
@@ -68,7 +66,7 @@ void DijkstraNodeState::setClosed(bool closed)
 	this->closed = closed;
 }
 
-void DijkstraNodeState::setPredecessor(shared_ptr<State> pred)
+void DijkstraNodeState::setPredecessor(State* pred)
 {
 	this->set = true;
 	this->pred = pred;

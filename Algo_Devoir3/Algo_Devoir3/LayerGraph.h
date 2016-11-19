@@ -19,8 +19,8 @@ public:
 	Path Dijkstra();
 	bool propagateStates(State& start, State& goal);
 	Path getOptimalPath();
-	Path getMinimumPath();
-	Path recursiveGetMinimumPath(const State* state,Path currentPath,Path& bestPath);
+	//Path getMinimumPath();
+	//Path recursiveGetMinimumPath(const State* state,Path currentPath,Path& bestPath);
 	bool isStateFinal(const State& state);
 };
 

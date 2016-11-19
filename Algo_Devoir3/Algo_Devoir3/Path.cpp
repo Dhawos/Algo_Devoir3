@@ -6,39 +6,18 @@
 Path::Path()
 {
 	this->weight = 0;
-	this->path = vector<const State*>();
+	this->path = vector<State*>();
 }
-
 
 Path::~Path()
 {
 }
 
-void Path::pushState(const State * newState)
+void Path::pushState(State * newState)
 {
-	bool isLegal = false;
-	if (this->path.empty()) {
-		isLegal = true;
-	}
-	if (!isLegal) {
-		for (Edge edge : this->path[this->path.size() - 1]->getEdges()) {
-			if (edge.getOutState()->compareIds(*newState)) {
-				isLegal = true;
-				this->weight += edge.getWeight();
-			}
-		}
-	}
-	if (isLegal) {
-		this->path.push_back(newState);
-	}
-	else {
-		throw InvalidEdgeException();
-	}
-}
-
-void Path::pushState(shared_ptr<State> state)
-{
-	this->path.insert(path.begin(), state.get());
+	this->path.push_back(newState);
+	weight = this->path[0]->getNodeState().getCost();
+	
 }
 
 int Path::getWeight()
@@ -74,4 +53,36 @@ bool Path::operator<(const Path & p) const
 bool Path::operator>(const Path & p) const
 {
 	return this->weight > p.weight;
+}
+
+ostream & operator<<(ostream & ostr, Path & pathToPrint)
+{
+	{
+		vector<State *>::reverse_iterator it;
+		for (it = pathToPrint.path.rbegin(); it != pathToPrint.path.rend(); ++it) {
+			if ((*it)->getId() == -1) {
+				ostr << "Debut" << " - ";
+			}
+			else if ((*it)->getId() == -2) {
+				ostr << "Fin";
+			}
+			else {
+				ostr << (*it)->getId() << " - ";
+			}
+		}
+		ostr << " | Cout total : " << pathToPrint.weight << std::endl;
+		ostr << "Mot trouve : ";
+		for (int i = pathToPrint.path.size()-2; i >= 1; i--) {
+			string letter;
+			State* currentState = pathToPrint.path[i];
+			State* nextState = pathToPrint.path[i - 1];
+			for (Edge edge : currentState->getEdges()) {
+				if (edge.getOutState() == nextState) {
+					letter = edge.getTransition();
+				}
+			}
+			ostr << letter;
+		}
+		return (ostr);
+	}
 }

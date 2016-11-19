@@ -9,22 +9,21 @@ private:
 	bool set;
 	int cost;
 	bool closed;
-	shared_ptr<State> pred;
+	State* pred;
 public:
 	DijkstraNodeState();
-	DijkstraNodeState(int cost, bool closed, shared_ptr<State> pred);
-	virtual ~DijkstraNodeState();
+	DijkstraNodeState(int cost, bool closed, State* pred);
 	//Getters
 	int getCost() const;
 	bool isClosed() const;
-	shared_ptr<State> getPredecessor() const;
+	State* getPredecessor() const;
 	//Setters
 	
 	void setCost(int cost);
 	void setClosed(bool closed);
-	void setPredecessor(shared_ptr<State> pred);
+	void setPredecessor(State* pred);
 	
-	void setNodeState(int cost, bool closed, shared_ptr<State> pred);
+	void setNodeState(int cost, bool closed, State* pred);
 	void reset();
 	//Others
 	bool isSet();

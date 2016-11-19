@@ -36,10 +36,12 @@ int main()
 	bool shouldExit = false;
 	CommandProcessor cmdProcessor = CommandProcessor(layerGraph,shouldExit);
 	cmdProcessor.printHelp();
+	std::cout << std::endl;
 	while (!shouldExit) {
 		std::cout << "Commande : ";
 		getline(std::cin, input);
 		cmdProcessor.processCommand(input);
+		std::cout << std::endl;
 	}
     return 0;
 }

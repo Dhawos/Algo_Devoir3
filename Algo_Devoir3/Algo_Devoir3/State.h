@@ -30,6 +30,7 @@ public:
 	bool const operator==(State &s1);
 	bool const operator>(State &s1);
 	bool const operator<(State &s1);
+	bool const operator>=(State &s1);
 };
 
 
