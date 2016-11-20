@@ -22,9 +22,10 @@ public:
 	int getNbOutEdges();
 	void addEdge(Edge edge);
 	void addEdge(State* outState, string transition, int weight);
+	void removeEdge(Edge& edge);
 	Edge getEdge(int i);
 	DijkstraNodeState& getNodeState();
-	const vector<Edge> & getEdges() const;
+	vector<Edge> & getEdges();
 	bool isFinal() const;
 	bool compareIds(State const &s1) const;
 	bool const operator==(State &s1);

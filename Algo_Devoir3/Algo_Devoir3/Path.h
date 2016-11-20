@@ -8,15 +8,19 @@ using std::shared_ptr;
 class Path
 {
 private:
-	vector<State*> path;
 	int weight;
 public:
-	Path();
+	vector<int> occurences;
+	vector<State*> path;
+	Path(int size);
+	Path(const Path& path);
 	virtual ~Path();
 	void pushState(State*);
-	//void pushState(shared_ptr<State> state);
+	void push_frontState(State * newState);
 	int getWeight();
 	int getLength();
+	//vector<State*>& getPath();
+	void Path::operator=(const Path &p);
 	bool Path::operator==(const Path &p) const;
 	bool Path::operator<=(const Path &p) const;
 	bool Path::operator>=(const Path &p) const;

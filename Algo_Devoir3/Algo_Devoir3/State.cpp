@@ -44,6 +44,17 @@ void State::addEdge(State* outState, string transition, int weight)
 	this->outEdges.push_back(newEdge);
 }
 
+void State::removeEdge(Edge & edge)
+{
+	vector<Edge>::iterator it;
+	for (it = outEdges.begin(); it != outEdges.end(); ++it) {
+		if (*it == edge) {
+			break;
+		}
+	}
+	it->markDeleted();
+}
+
 Edge State::getEdge(int i)
 {
 	return this->outEdges[i];
@@ -54,7 +65,7 @@ DijkstraNodeState & State::getNodeState()
 	return this->nodeState;
 }
 
-const vector<Edge>& State::getEdges() const
+vector<Edge>& State::getEdges()
 {
 	return this->outEdges;
 }

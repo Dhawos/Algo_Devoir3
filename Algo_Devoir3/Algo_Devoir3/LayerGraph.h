@@ -13,15 +13,17 @@ private:
 	State sourceState;
 	vector<vector<State>> layers;
 	State finalState;
+	vector<Path> legalpaths;
 public:
 	LayerGraph(AFDGraph graph, int wordLength, vector<int> maximums, vector<int> minimums);
 	virtual ~LayerGraph();
 	Path Dijkstra();
 	bool propagateStates(State& start, State& goal);
 	Path getOptimalPath();
-	bool checkConstraints(State* state);
-	//Path getMinimumPath();
-	//Path recursiveGetMinimumPath(const State* state,Path currentPath,Path& bestPath);
-	bool isStateFinal(const State& state);
+	bool checkConstraints(Path& Path);
+	bool isStateFinal(State& state);
+	vector<Path> getLegalPaths();
+	void recGetLegalPaths(State* state, Path path, vector<Path>& paths);
+	void removeIllegalEdges();
 };
 

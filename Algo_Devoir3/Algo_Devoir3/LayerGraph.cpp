@@ -3,13 +3,15 @@
 #include "Edge.h"
 #include <vector>
 #include <algorithm>
-#include <queue>
+#include <set>
 using std::vector;
 using std::find;
 using std::push_heap;
 using std::pop_heap;
 using std::make_heap;
 using std::stoi;
+using std::set;
+using std::pair;
 
 bool compare(State* a, State* b)
 {
@@ -69,6 +71,8 @@ LayerGraph::LayerGraph(AFDGraph graph, int wordLength, vector<int> maximums, vec
 			state.addEdge(newEdge);
 		}
 	}
+	//Removing useless edges
+	//removeIllegalEdges();
 }
 
 LayerGraph::~LayerGraph()
@@ -86,7 +90,7 @@ Path LayerGraph::Dijkstra()
 			return getOptimalPath();
 		}
 		else {
-			return Path();
+			return Path(maximums.size());
 		}
 	}
 }
@@ -104,28 +108,46 @@ bool LayerGraph::propagateStates(State& start, State& goal)
 		currentState = heap.back();
 		heap.pop_back();
 		currentState->getNodeState().setClosed(true);
+		State* outState = NULL;
 		for (Edge edge : currentState->getEdges()) {
-			trialCost = currentState->getNodeState().getCost() + edge.getWeight();
-			State* outState = edge.getOutState();
-			if (outState->getNodeState().isSet()) {
-				if (!edge.getOutState()->getNodeState().isClosed() && trialCost < edge.getOutState()->getNodeState().getCost()) {
-					vector<State *>::iterator it;
-					for (it = heap.begin(); it != heap.end(); ++it) {
-						if ((*it)->getId() == outState->getId()) {
-							break;
+			if(!edge.isDeleted()){
+				trialCost = currentState->getNodeState().getCost() + edge.getWeight();
+				outState = edge.getOutState();
+				if (outState->getNodeState().isSet()) {
+					if (!edge.getOutState()->getNodeState().isClosed() && trialCost < edge.getOutState()->getNodeState().getCost()) {
+						vector<State *>::iterator it;
+						for (it = heap.begin(); it != heap.end(); ++it) {
+							if ((*it)->getId() == outState->getId()) {
+								break;							}
+							}
+						(*it)->getNodeState().setCost(trialCost);
+						outState->getNodeState().setPredecessor(currentState);
+						outState->getNodeState().setCost(trialCost);
+						make_heap(heap.begin(), heap.end(), compare);
+					}
+				}
+				else {
+					if (outState != NULL) {
+						Path path = Path(maximums.size());
+						State* cState = currentState;
+						path.pushState(outState);
+						while (cState->getId() != sourceState.getId()) {
+							path.pushState(cState);
+							cState = cState->getNodeState().getPredecessor();
+						}
+						path.pushState(&sourceState);
+						bool isStillValid = true;
+						for (int i = 0; i < path.occurences.size(); i++) {//Enforcing maximums to avoid spending time on useless paths
+							if (path.occurences[i] > maximums[i]) {
+								isStillValid = false;
+							}
+						}
+						if (isStillValid) {
+							outState->getNodeState().setNodeState(trialCost, false, currentState);
+							heap.push_back(outState);
+							push_heap(heap.begin(), heap.end(), compare);
 						}
 					}
-					(*it)->getNodeState().setCost(trialCost);
-					outState->getNodeState().setPredecessor(currentState);
-					outState->getNodeState().setCost(trialCost);
-					make_heap(heap.begin(), heap.end(), compare);
-				}
-			}
-			else {
-				outState->getNodeState().setNodeState(trialCost, false, currentState);
-				if (checkConstraints(outState)) {
-					heap.push_back(outState);
-					push_heap(heap.begin(), heap.end(), compare);
 				}
 			}
 		}
@@ -136,7 +158,7 @@ bool LayerGraph::propagateStates(State& start, State& goal)
 Path LayerGraph::getOptimalPath()
 {
 	State* currentState = &this->finalState;
-	Path path = Path();
+	Path path = Path(maximums.size());
 	while (currentState->getId() != sourceState.getId()) {
 		path.pushState(currentState);
 		currentState = currentState->getNodeState().getPredecessor();
@@ -145,34 +167,113 @@ Path LayerGraph::getOptimalPath()
 	return path;
 }
 
-bool LayerGraph::checkConstraints(State * state)
+bool LayerGraph::checkConstraints(Path& path)
 {
-	vector<int> occurences = vector<int>(maximums.size(),0);
-	State* currentState = state;
-	while (!(*currentState == sourceState)) {
-		State* previousState = currentState->getNodeState().getPredecessor();
-		for (Edge edge : previousState->getEdges()) {
-			if (edge.getOutState() == currentState && edge.getTransition() != "") {
-				int index = stoi(edge.getTransition()) - 1;
-				occurences[index]++;
+	/*
+	vector<int> occurences = vector<int>(maximums.size(), 0);
+	for (int i = path.path.size() - 2; i > 1; i--) {
+		string letter;
+		State* currentState = path.path[i];
+		State* nextState = path.path[i - 1];
+		for (Edge edge : currentState->getEdges()) {
+			if (!edge.isDeleted()) {
+				if (edge.getOutState() == nextState) {
+					letter = edge.getTransition();
+					int index = stoi(letter) - 1;
+					occurences[index]++;
+				}
 			}
 		}
-		currentState = previousState;
 	}
-	for (int i = 0; i < occurences.size(); i++) {
-		if (/*occurences[i] < minimums[i] || */occurences[i] > maximums[i]) {
+	*/
+	for (int i = 0; i < path.occurences.size(); i++) {
+		if (path.occurences[i] < minimums[i] || path.occurences[i] > maximums[i]) {
 			return false;
 		}
 	}
 	return true;
 }
 
-bool LayerGraph::isStateFinal(const State & state)
+bool LayerGraph::isStateFinal(State & state)
 {
 	for (Edge edge : state.getEdges()) {
-		if (edge.getOutState()->isFinal()) {
-			return true;
+		if (!edge.isDeleted()) {
+			if (edge.getOutState()->isFinal()) {
+				return true;
+			}
 		}
 	}
 	return false;
 }
+
+vector<Path> LayerGraph::getLegalPaths()
+{
+	Path path = Path(maximums.size());
+	path.push_frontState(&sourceState);
+	vector<Path> paths = vector<Path>();
+	recGetLegalPaths(&sourceState,path,paths);
+	this->legalpaths = paths;
+	return paths;
+}
+
+void LayerGraph::recGetLegalPaths(State* currentState, Path path, vector<Path>& paths)
+{
+	if (currentState->isFinal()) {
+		if (checkConstraints(path)) {
+			paths.push_back(path);
+		}
+	}
+	else {
+		for (Edge edge : currentState->getEdges()) {
+			if (!edge.isDeleted()) {
+				Path newPath = path;
+				newPath.push_frontState(edge.getOutState());
+				bool isStillValid = true;
+				for (int i = 0; i < newPath.occurences.size(); i++) {//Enforcing maximums to avoid spending time on useless paths
+					if (newPath.occurences[i] > maximums[i]) {
+						isStillValid = false;
+					}
+				}
+				if (isStillValid) {
+					recGetLegalPaths(edge.getOutState(), newPath, paths);
+				}
+			}
+		}
+	}
+}
+
+void LayerGraph::removeIllegalEdges()
+{
+	vector<Path> paths = getLegalPaths();
+	set<Edge*> legalEdges;
+	for (Path currentPath : paths) {
+		for (int i = currentPath.path.size() - 2; i > 0; i--) {
+			State* currentState = currentPath.path[i];
+			State* nextState = currentPath.path[i - 1];
+			Edge* edge = NULL;
+			for (int j = 0; j < currentState->getEdges().size(); j++) {
+				edge = &(currentState->getEdges()[j]);
+				if (!edge->isDeleted()) {
+					if (edge->getOutState() == nextState) {
+						legalEdges.insert(edge);
+					}
+				}
+			}
+		}
+	}
+	Edge* edge = NULL;
+	//Removing all illegal edges from layers
+	for (vector<State>& layer : layers) {
+		for (State& currentState : layer) {
+			for (int j = 0; j < currentState.getEdges().size(); j++) {
+				edge = &(currentState.getEdges()[j]);
+				if (!edge->isDeleted()){
+					if (legalEdges.find(edge) == legalEdges.end()) {
+						currentState.removeEdge(*edge);
+					}
+				}
+			}
+		}
+	}
+}
+
