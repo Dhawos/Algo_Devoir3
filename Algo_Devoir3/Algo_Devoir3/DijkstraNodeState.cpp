@@ -46,6 +46,7 @@ State* DijkstraNodeState::getPredecessor() const
 		throw std::exception();
 	}
 }
+
 void DijkstraNodeState::setNodeState(int cost, bool closed, State* pred)
 {
 	set = true;
@@ -74,7 +75,10 @@ void DijkstraNodeState::setPredecessor(State* pred)
 
 void DijkstraNodeState::reset()
 {
-	set = false;
+	this->set = false;
+	this->cost = -1;
+	this->closed = false;
+	this->pred = NULL;
 }
 
 bool DijkstraNodeState::isSet()
