@@ -41,11 +41,13 @@ void Path::push_frontState(State * newState)
 {
 	this->path.insert(this->path.begin(),newState);
 	if(path.size() > 1){
-		for (Edge edge : newState->getEdges()) {
-			if (edge.getOutState()->getId() == path[1]->getId()) {
+		for (Edge edge : path[1]->getEdges()) {
+			if (edge.getOutState()->getId() == newState->getId()) {
 				weight += edge.getWeight();
-				int index = stoi(edge.getTransition()) - 1;
-				occurences[index]++;
+				if (edge.getTransition() != "") {
+					int index = stoi(edge.getTransition()) - 1;
+					occurences[index]++;
+				}
 			}
 		}
 	}

@@ -22,6 +22,7 @@ public:
 	Path getOptimalPath();
 	bool checkConstraints(Path& Path);
 	bool isStateFinal(State& state);
+	bool canPathBeLegal(Path path);
 	vector<Path> getLegalPaths();
 	void recGetLegalPaths(State* state, Path path, vector<Path>& paths);
 	void removeIllegalEdges();

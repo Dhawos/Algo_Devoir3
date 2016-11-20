@@ -71,8 +71,6 @@ LayerGraph::LayerGraph(AFDGraph graph, int wordLength, vector<int> maximums, vec
 			state.addEdge(newEdge);
 		}
 	}
-	//Removing useless edges
-	//removeIllegalEdges();
 }
 
 LayerGraph::~LayerGraph()
@@ -136,13 +134,7 @@ bool LayerGraph::propagateStates(State& start, State& goal)
 							cState = cState->getNodeState().getPredecessor();
 						}
 						path.pushState(&sourceState);
-						bool isStillValid = true;
-						for (int i = 0; i < path.occurences.size(); i++) {//Enforcing maximums to avoid spending time on useless paths
-							if (path.occurences[i] > maximums[i]) {
-								isStillValid = false;
-							}
-						}
-						if (isStillValid) {
+						if (canPathBeLegal(path)) {
 							outState->getNodeState().setNodeState(trialCost, false, currentState);
 							heap.push_back(outState);
 							push_heap(heap.begin(), heap.end(), compare);
@@ -169,23 +161,6 @@ Path LayerGraph::getOptimalPath()
 
 bool LayerGraph::checkConstraints(Path& path)
 {
-	/*
-	vector<int> occurences = vector<int>(maximums.size(), 0);
-	for (int i = path.path.size() - 2; i > 1; i--) {
-		string letter;
-		State* currentState = path.path[i];
-		State* nextState = path.path[i - 1];
-		for (Edge edge : currentState->getEdges()) {
-			if (!edge.isDeleted()) {
-				if (edge.getOutState() == nextState) {
-					letter = edge.getTransition();
-					int index = stoi(letter) - 1;
-					occurences[index]++;
-				}
-			}
-		}
-	}
-	*/
 	for (int i = 0; i < path.occurences.size(); i++) {
 		if (path.occurences[i] < minimums[i] || path.occurences[i] > maximums[i]) {
 			return false;
@@ -204,6 +179,31 @@ bool LayerGraph::isStateFinal(State & state)
 		}
 	}
 	return false;
+}
+
+bool LayerGraph::canPathBeLegal(Path path)
+{
+	State* lastState = path.path[0];
+	if (lastState->isFinal()) {
+		return checkConstraints(path);
+	}
+	else {
+		for (int i = 0; i < path.occurences.size(); i++) {
+			if (path.occurences[i] > maximums[i]) {
+				return false;
+			}
+		}
+		bool legality = false;
+		for (Edge edge : lastState->getEdges()) {
+			Path newPath = Path(path);
+			newPath.push_frontState(edge.getOutState());
+			if (canPathBeLegal(newPath)) {
+				legality = true;
+				break;
+			}
+		}
+		return legality;
+	}
 }
 
 vector<Path> LayerGraph::getLegalPaths()
