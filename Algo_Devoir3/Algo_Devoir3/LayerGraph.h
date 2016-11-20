@@ -28,7 +28,9 @@ public:
 	bool isStateFinal(State& state);
 	bool canPathBeLegal(Path path);
 	Path firstLegalPath(Path path);
+	Path firstLegalPath(Path path,int bound);
 	Path isEdgeOnLegalPath(Edge* edge);
+	Path isEdgeOnLegalPath(Edge* edge, int bound);
 	vector<Path> getLegalPaths();
 	void recGetLegalPaths(State* state, Path path, vector<Path>& paths);
 	void removeIllegalEdges();

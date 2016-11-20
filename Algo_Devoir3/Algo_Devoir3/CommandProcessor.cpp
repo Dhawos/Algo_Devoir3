@@ -60,13 +60,29 @@ void CommandProcessor::processCommand(string command)
 			std::cout << "L'arrete n'a pas pu etre localisee" << std::endl;
 		}
 		else {
-			Path path = this->layerGraph->isEdgeOnLegalPath(edge);
-			if (path.path.empty()) {
-				std::cout << "Cette arrete n'apparait sur aucun chemin realisable" << std::endl;
+			std::cout << "Borne superieure ? Laisser vide pour une recherche sans borne" << std::endl;
+			getline(std::cin, input);
+			if (input != "") {
+				int bound;
+				bound = stoi(input);
+				Path path = this->layerGraph->isEdgeOnLegalPath(edge,bound);
+				if (path.path.empty()) {
+					std::cout << "Cette arrete n'apparait sur aucun chemin realisable de cout inferieur ou egal a " << bound << std::endl;
+				}
+				else {
+					std::cout << "Voici le chemin sur lequel cette arrete apparait de cout inferieur a " << bound << std::endl;
+					std::cout << path << std::endl;
+				}
 			}
 			else {
-				std::cout << "Voici le chemin sur lequel cette arrete apparait" << std::endl;
-				std::cout << path << std::endl;
+				Path path = this->layerGraph->isEdgeOnLegalPath(edge);
+				if (path.path.empty()) {
+					std::cout << "Cette arrete n'apparait sur aucun chemin realisable" << std::endl;
+				}
+				else {
+					std::cout << "Voici le chemin sur lequel cette arrete apparait" << std::endl;
+					std::cout << path << std::endl;
+				}
 			}
 		}
 	}
@@ -85,7 +101,6 @@ void CommandProcessor::processCommand(string command)
 void CommandProcessor::findMinimumPath()
 {
 	std::cout << "Voici le chemin de poids minimum dans le graphe :" << std::endl;
-	//std::cout << this->layerGraph->getMinimumPath() << std::endl;
 	Path path = this->layerGraph->Dijkstra();
 	if (path.path.size() == 0) {
 		std::cout << "Aucun chemin valide trouve" << std::endl;

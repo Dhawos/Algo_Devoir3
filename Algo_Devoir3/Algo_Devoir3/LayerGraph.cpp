@@ -360,6 +360,50 @@ Path LayerGraph::firstLegalPath(Path path)
 	}
 }
 
+Path LayerGraph::firstLegalPath(Path path,  int bound)
+{
+	State* lastState = path.path[0];
+	if (lastState->isFinal()) {
+		if (checkConstraints(path)) {
+			return path;
+		}
+		else
+		{
+			return Path(maximums.size());
+		}
+	}
+	else {
+		//If a maximum is breached we can stop there
+		for (int i = 0; i < path.occurences.size(); i++) {
+			if (path.occurences[i] > maximums[i]) {
+				return Path(maximums.size());
+			}
+		}
+		//If we don't have enough layers remaining we can also stop there
+		int nbMissingEdges = 0;
+		for (int i = 0; i < path.occurences.size(); i++) {
+			if (path.occurences[i] < minimums[i]) {
+				nbMissingEdges += minimums[i] - path.occurences[i];
+			}
+		}
+		if (nbMissingEdges > layers.size() - path.getLength() + 1) {
+			return Path(maximums.size());
+		}
+		bool legality = false;
+		for (Edge edge : lastState->getEdges()) {
+			Path newPath = Path(path);
+			newPath.push_frontState(edge.getOutState());
+			if (newPath.getWeight() <= bound) {
+				Path result = firstLegalPath(newPath,bound);
+				if (result.path.size() > 0) {
+					return result;
+				}
+			}
+		}
+		return Path(maximums.size());
+	}
+}
+
 Path LayerGraph::isEdgeOnLegalPath(Edge * edge)
 {
 	//Resetting the graph
@@ -374,13 +418,26 @@ Path LayerGraph::isEdgeOnLegalPath(Edge * edge)
 	if (goalReached) {
 		Path path = getOptimalPath(edge->getOutState());
 		return firstLegalPath(path);
-		/*for (Edge edge : path.path[path.getLength()-1]->getEdges()) {
-			Path newPath = Path(path);
-			newPath.push_frontState(edge.getOutState());
-			return firstLegalPath(newPath);
-		}
+	}
+	else {
 		return Path(maximums.size());
-		*/
+	}
+}
+
+Path LayerGraph::isEdgeOnLegalPath(Edge * edge,int bound)
+{
+	//Resetting the graph
+	sourceState.getNodeState().reset();
+	finalState.getNodeState().reset();
+	for (vector<State>& layer : layers) {
+		for (State& state : layer) {
+			state.getNodeState().reset();
+		}
+	}
+	bool goalReached = propagateStates(this->sourceState, edge->getOutState());
+	if (goalReached) {
+		Path path = getOptimalPath(edge->getOutState());
+		return firstLegalPath(path,bound);
 	}
 	else {
 		return Path(maximums.size());
