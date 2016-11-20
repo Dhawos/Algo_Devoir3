@@ -188,10 +188,21 @@ bool LayerGraph::canPathBeLegal(Path path)
 		return checkConstraints(path);
 	}
 	else {
+		//If a maximum is breached we can stop there
 		for (int i = 0; i < path.occurences.size(); i++) {
 			if (path.occurences[i] > maximums[i]) {
 				return false;
 			}
+		}
+		//If we don't have enough layers remaining we can also stop there
+		int nbMissingEdges = 0;
+		for (int i = 0; i < path.occurences.size(); i++) {
+			if (path.occurences[i] < minimums[i]) {
+				nbMissingEdges += minimums[i] - path.occurences[i];
+			}
+		}
+		if (nbMissingEdges > layers.size() - path.getLength() + 1) {
+			return false;
 		}
 		bool legality = false;
 		for (Edge edge : lastState->getEdges()) {
